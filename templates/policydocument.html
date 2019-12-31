@@ -1,0 +1,96 @@
+<html>
+  <head>
+    <title>Policy Document Upload demo</title>
+  
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.green-light_green.min.css" />
+    <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+
+    <link rel="stylesheet" href="/public/style.css">
+  </head>
+  
+  <body>
+  
+      
+      <p>
+        <li>Policy Document Upload demo</li>
+      </p>
+      <div class="mdl-layout-spacer"></div>
+
+        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+          <input class="mdl-textfield__input" type="text" id="gsfilename" name="gsfilename" value="README.md">
+          <label class="mdl-textfield__label" for="gsfilename">FileName:</label>
+        </div>
+
+        <input class="mdl-button mdl-button--raised mdl-button--colored"  type="button" value="Generate Policy Document SignedURL" onclick="return generatePolicyDocumentSignedURL()">
+
+
+        <textarea id="txtPolicy" cols=70 rows=20></textarea>
+        
+
+        <div  class="mdl-textfield mdl-js-textfield mdl-textfield--file" id="status"></div>  
+     
+        
+          <div class="mdl-textfield mdl-js-textfield mdl-textfield--file">
+            <input type="file" id="file">
+          </div>
+    
+          <div class="mdl-layout-spacer"></div>
+          <button class="mdl-button mdl-button--raised mdl-button--colored"  id="btnupload" name="btnupload" onclick="uploadPolicyDocFile()" disabled>Upload</button>
+        
+          <div class="mdl-layout-spacer"></div>
+
+        
+
+        <br/>
+        <hr/> 
+
+      <script src="//code.jquery.com/jquery-3.1.0.min.js"></script>
+      <script type="text/javascript">
+      
+      
+      var policydoc;
+      
+      function uploadPolicyDocFile() {
+
+        var formData = new FormData();
+        var fileField = document.querySelector("input[type='file']");
+
+        formData.append('key', 'myfolder/' + $("#gsfilename").val());
+        formData.append('bucket', policydoc.bucket);
+        formData.append('GoogleAccessId', policydoc.GoogleAccessId);
+        formData.append('acl', "bucket-owner-read");
+        formData.append('policy', policydoc.policy);
+        formData.append('Content-Type', "text/plain");
+        formData.append('signature', policydoc.signature);
+        formData.append('file', fileField.files[0]);
+        
+        url = 'https://storage.googleapis.com/' + policydoc.bucket
+
+        fetch(url, {
+          method: 'POST',
+          body: formData
+        })
+        .then(response => response.text())
+        .catch(error =>  $("#status").html(error)
+        )
+        .then(response => $("#status").html('File uploaded successfully'));
+      }
+      
+      async function generatePolicyDocumentSignedURL() {
+        file = $('input[name="gsfilename"]').val();
+        const response = await fetch('/getSignedPolicyDocument?filename='+ file)
+        policydoc = await response.json();
+
+        $("#txtPolicy").val(JSON.stringify(policydoc,null,2));          
+        $("#btnupload").attr("disabled", false)        
+
+        return false;
+      }
+  
+      </script>
+      
+  
+  </body>
+  
+  </html>

@@ -1,0 +1,112 @@
+
+
+<html>
+  <head>
+    <title>SignedURL upload/downlaod</title>
+  
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.green-light_green.min.css" />
+    <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+
+    <link rel="stylesheet" href="/public/style.css">
+  </head>
+  
+  <body>
+  
+      
+      <p>
+        <li>Signed URL Upload/Download demo</li>
+      </p>
+      <div class="mdl-layout-spacer"></div>
+
+        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+          <input class="mdl-textfield__input" type="text" id="gsfilename" name="gsfilename" value="README.md">
+          <label class="mdl-textfield__label" for="gsfilename">FileName:</label>
+        </div>
+  
+        <div class="mdl-layout-spacer"></div>
+        <div>
+          <input type="radio" name="verb" value="PUT" checked>
+          <label for="PUT">Upload</label>
+        </div>
+        <div class="mdl-layout-spacer"></div>
+        <div>
+          <input type="radio" name="verb" value="GET">
+          <label for="GET">Download</label>
+        </div>
+
+        <input class="mdl-button mdl-button--raised mdl-button--colored"  type="button" value="Generate SignedURL" onclick="return generateSignedURL()">
+
+
+      <br/>
+      <br/>
+      <hr/>
+
+      <a href="" id="dlurl" name="dlurl" style="color:black;"></a>
+      </div>
+
+
+      <div class="mdl-textfield mdl-js-textfield mdl-textfield--file">
+        <input type="file" id="selector">
+      </div>
+
+      <div class="mdl-layout-spacer"></div>
+      <button class="mdl-button mdl-button--raised mdl-button--colored"  id="btnupload" name="btnupload" onclick="upload()" disabled>Upload SignedURL</button>
+    
+      <div class="mdl-layout-spacer"></div>
+      <br/>
+      <hr/> 
+
+      <div  class="mdl-textfield mdl-js-textfield mdl-textfield--file" id="status"></div>  
+
+
+      <script src="//code.jquery.com/jquery-3.1.0.min.js"></script>
+      <script type="text/javascript">
+      
+      function upload() {       
+           var file = $('#selector')[0].files[0];
+           uploadFile(file)
+      }
+
+      function download() {       
+           var file = $('input[name=filename]').val();
+           retrieveNewURL(file, 'GET', url => {
+            $("#dlurl").attr("href", url)
+            $("#dlurl").text(url)
+           })       
+      }
+      
+      async function generateSignedURL() {
+        file = $('input[name="gsfilename"]').val();
+        action = $('input[name="verb"]:checked').val();
+        const response = await fetch('/getSignedURL?filename='+ file + "&action=" + action)
+        var c = await response.text();
+        c = c.replace(/\"/g, "")
+        console.log("Got signedURL: " + c)
+        $("#dlurl").text(c)
+        $("#dlurl").attr("href", c)
+        
+        if (action == "PUT") {
+          $("#btnupload").attr("disabled", false)
+        }
+        return false;
+      }
+
+      function uploadFile(file) {
+        url = $("#dlurl").text()
+        fetch(url, {
+          method: 'PUT',
+          body: file
+        })
+        .then(response => response.text())
+        .catch(error =>  $("#status").html(error)
+        )
+        .then(response => $("#status").html('File uploaded successfully'));
+      }
+  
+      </script>
+      
+  
+  </body>
+  
+  </html>
