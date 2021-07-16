@@ -12,16 +12,16 @@ import string
 import datetime
 
 import requests
-import httplib as http_client
+import http.client as http_client
 
 from google.cloud import storage
 
 # os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'service_account.json'
 import google.auth
 from google.oauth2 import service_account 
-credentials = service_account.Credentials.from_service_account_file('service_account.json')
+credentials = service_account.Credentials.from_service_account_file('svc_account.json')
 
-bucketName = 'netapp-producer-urlsigner'
+bucketName = 'YOUR_PROJECT-urlsigner'
 client = storage.Client(credentials=credentials)
 bucket = client.get_bucket(bucketName)
 

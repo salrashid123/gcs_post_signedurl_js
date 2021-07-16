@@ -18,7 +18,7 @@ to configure CORS access for SignedURLs
 
 ### Create Service Account
 
-```
+```bash
 PROJECT_NAME=$(gcloud config list --format="value(core.project)")
 
 $ gcloud iam service-accounts create urlsigner --display-name="GCS URL Signer" --project=${PROJECT_NAME}
@@ -28,7 +28,7 @@ $ gcloud iam service-accounts keys  create service_account.json --iam-account=ur
 
 ### Create GCS Bucket 
 
-```
+```bash
  gsutil mb gs://$PROJECT_NAME-urlsigner
 ```
 
@@ -77,8 +77,10 @@ gsutil cors set cors.txt gs://$PROJECT_NAME-urlsigner
 
 - Verify:
 
-```
-curl -v -X OPTIONS -H "Host: storage.googleapis.com" -H "Access-Control-Request-Method: PUT"  -H "Origin: https://gcs.somedomain.com:8081" "https://storage.googleapis.com/$PROJECT_NAME-urlsigner/cors.txt"
+```bash
+curl -v -X OPTIONS -H "Host: storage.googleapis.com" -H "Access-Control-Request-Method: PUT" \
+    -H "Origin: https://gcs.somedomain.com:8081" \
+    "https://storage.googleapis.com/$PROJECT_NAME-urlsigner/cors.txt"
 
 
 < HTTP/2 200 
