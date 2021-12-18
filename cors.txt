@@ -1,7 +1,7 @@
 [
     {
-      "origin": ["https://gcs.somedomain.com:8081"],
-      "responseHeader": ["Content-Type", "Authorization",  "Content-Length", "User-Agent", "x-goog-resumable"],
+      "origin": ["https://localhost:8081"],
+      "responseHeader": ["Content-Type", "Authorization",  "Content-Length", "User-Agent", "x-goog-resumable", "cache-control", "x-requested-with"],
       "method": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
       "maxAgeSeconds": 3600
     }

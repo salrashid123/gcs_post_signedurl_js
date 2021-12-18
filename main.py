@@ -21,7 +21,7 @@ import google.auth
 from google.oauth2 import service_account 
 credentials = service_account.Credentials.from_service_account_file('svc_account.json')
 
-bucketName = 'YOUR_PROJECT-urlsigner'
+bucketName = 'uploader-334920-urlsigner'
 client = storage.Client(credentials=credentials)
 bucket = client.get_bucket(bucketName)
 
@@ -58,6 +58,10 @@ def policydoucment():
 @app.route('/signedurl')
 def signedurl():
   return render_template('signedurl.html')
+
+@app.route('/dropzone')
+def home():
+  return render_template('dropzone.html')
 
 @app.route('/')
 def index():

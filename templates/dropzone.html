@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/dropzone/dist/min/dropzone.min.css" integrity="sha256-e47xOkXs1JXFbjjpoRr1/LhVcqSzRmGmPqsrUQeVs+g=" crossorigin="anonymous">
+    <title>Flask-S3-Dropzone Demo</title>
+  </head>
+  <body>
+    <div class="container">
+
+      <div>
+        <!-- Dropzone -->
+        <div id="upload-widget" class="dropzone"></div>
+        <button id="dropzone-btn" class="btn btn-success btn-block">Upload</button>
+        <!-- Preview Template -->
+        <div id="tpl">
+          <div class="d-flex justify-content-between">
+            <h5>
+              <span class="" data-dz-name></span> - <small data-dz-size></small> <small class="text-danger" data-dz-errormessage></small>
+            </h5>
+          </div>
+          <div class="progress" style="height: 10px;">
+            <div
+              class="progress-bar progress-bar-striped bg-success" role="progressbar"
+              style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" data-dz-uploadprogress
+            ></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dropzone@5.5.1/dist/dropzone.min.js"></script>
+
+    <script>
+      const previewNode = document.querySelector("#tpl");
+      const previewTemplate = previewNode.outerHTML;
+      previewNode.id = "";
+      previewNode.parentNode.removeChild(previewNode);
+    
+      Dropzone.autoDiscover = false;
+      const uploader = new Dropzone("#upload-widget", {
+        dictDefaultMessage: "Drop or click here to add files",
+        url: "https://endpoint.com/",  // will be overwritten dynamically
+        method: "PUT",
+        timeout: 3600000,
+        parallelUploads: 1,
+        maxFilesize: 1000,  // MB
+        autoProcessQueue: false,
+        addRemoveLinks: true,
+        createImageThumbnails: false,
+        previewTemplate: previewTemplate,
+        accept: function (file, done) {
+          const req = new XMLHttpRequest();
+          req.onreadystatechange = () => {
+            if (req.readyState === XMLHttpRequest.DONE) {
+              if (req.status === 200) {
+                this.options.url = req.responseText.replace(/\"/g, "");
+                done();
+              } else {
+                done("Fail to get pre-signed url.");
+              }
+            }
+          };
+          params = "filename=" + file.name + "&action=PUT";
+          req.open("GET",'/getSignedURL?'+params, true);
+          req.setRequestHeader("Content-type", "application/json; charset=UTF-8");
+          req.send(null);
+        },
+      });
+    
+      uploader.on('sending', (file, xhr, formData) => {
+      });
+    
+      uploader.on("success", () => {
+        uploader.options.autoProcessQueue = true;  // https://github.com/enyo/dropzone/issues/462
+      });
+    
+      uploader.on("queuecomplete", () => {
+        uploader.options.autoProcessQueue = false;
+      });
+    
+    
+      document.querySelector("#dropzone-btn").addEventListener("click", function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        uploader.processQueue();
+      });
+    </script>
+  </body>
+</html>
+
+
