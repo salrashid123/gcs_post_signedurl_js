@@ -27,9 +27,9 @@
 
         <textarea id="txtPolicy" cols=70 rows=20></textarea>
         
-
+        <p>Response status: 
         <div  class="mdl-textfield mdl-js-textfield mdl-textfield--file" id="status"></div>  
-     
+        </p>
         
           <div class="mdl-textfield mdl-js-textfield mdl-textfield--file">
             <input type="file" id="file">
@@ -71,10 +71,9 @@
           method: 'POST',
           body: formData
         })
-        .then(response => response.text())
+        .then(response => $("#status").html(response.statusText))
         .catch(error =>  $("#status").html(error)
         )
-        .then(response => $("#status").html('File uploaded successfully'));
       }
       
       async function generatePolicyDocumentSignedURL() {

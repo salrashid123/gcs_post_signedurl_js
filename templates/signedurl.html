@@ -57,8 +57,9 @@
       <br/>
       <hr/> 
 
-      <div  class="mdl-textfield mdl-js-textfield mdl-textfield--file" id="status"></div>  
-
+      <p>Response status: 
+        <div  class="mdl-textfield mdl-js-textfield mdl-textfield--file" id="status"></div>  
+      </p>
 
       <script src="//code.jquery.com/jquery-3.1.0.min.js"></script>
       <script type="text/javascript">
@@ -98,10 +99,9 @@
           method: 'PUT',
           body: file
         })
-        .then(response => response.text())
+        .then(response => $("#status").html(response.statusText))
         .catch(error =>  $("#status").html(error)
         )
-        .then(response => $("#status").html('File uploaded successfully'));
       }
   
       </script>
